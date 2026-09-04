@@ -249,6 +249,23 @@ describe("Client", function () {
                 `test0=null || test1="a'b'c'\\"\\n\\\\" || test2=null || test3=true || test4=false || test5=123 || test6=-123.45 || test7=123.45 || test8="2023-10-18 07:11:12.000Z" || test9="[1,2,3,\\"test'12\\\\\\"3\\"]" || test10="{\\"a\\":\\"test'123\\"}" || test11="a\\"b" || test12=123 || test13="[1,\\"a\\\\\\"b\\"]" || test14="{\\"a\\":\\"a\\\\\\"b\\"}"`,
             );
         });
+
+        test("filter expression with param values containing $ patterns", function () {
+            const client = new Client("test_base_url", null, "test_language_A");
+
+            assert.equal(client.filter("title = {:v}", { v: "a$&b" }), 'title = "a$&b"');
+
+            assert.equal(client.filter("title = {:v}", { v: "a$`b" }), 'title = "a$`b"');
+
+            assert.equal(client.filter("title = {:v}", { v: "a$'b" }), `title = "a$'b"`);
+
+            assert.equal(client.filter("title = {:v}", { v: "a$$b" }), 'title = "a$$b"');
+
+            assert.equal(
+                client.filter('status = "live" && title ~ {:q}', { q: "$`" }),
+                'status = "live" && title ~ "$`"',
+            );
+        });
     });
 
     describe("send()", function () {
