@@ -322,7 +322,7 @@ export default class Client {
         }
 
         for (let key in params) {
-            raw = raw.replaceAll("{:" + key + "}", quotify(params[key]));
+            raw = raw.replaceAll("{:" + key + "}", () => quotify(params[key]));
         }
 
         return raw;
